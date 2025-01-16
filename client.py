@@ -1,16 +1,32 @@
 import socket
-from time import sleep
 
-sock = socket.socket()
-sock.setblocking(1)
-sock.connect(('10.38.165.12', 9090))
+def start_client():
+    host = 'localhost'
+    port = 9090
 
-#msg = input()
-msg = "Hi!"
-sock.send(msg.encode())
+    print("[INFO] Connecting to the server...")
+    client_socket = socket.socket()
+    client_socket.connect((host, port))
+    print("[INFO] Connected to the server.")
 
-data = sock.recv(1024)
+    try:
+        while True:
+            message = input("Enter message (type 'exit' to quit): ")
+            client_socket.send(message.encode())
+            print(f"[INFO] Sent to server: {message}")
 
-sock.close()
+            if message.strip().lower() == "exit":
+                print("[INFO] Exit command sent. Closing connection.")
+                break
 
-print(data.decode())
+            data = client_socket.recv(1024)
+            print(f"[INFO] Received from server: {data.decode()}")
+
+    except Exception as e:
+        print(f"[ERROR] {e}")
+    finally:
+        client_socket.close()
+        print("[INFO] Connection closed.")
+
+if __name__ == "__main__":
+    start_client()
